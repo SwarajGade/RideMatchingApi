@@ -1,0 +1,473 @@
+openapi: 3.1.0
+info:
+  title: Ride Matching API
+  description: "API for ride-matching services, allowing consumers to fetch available captains, check surge pricing, and view active captains."
+  version: "2.0"
+servers:
+- url: https://api.voltacabs.com/v2/ride-matching
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    CaptainsResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          examples:
+          - - success
+            - success
+        message:
+          type: string
+          examples:
+          - - fetched
+            - Captains fetched successfully.
+        data:
+          type: object
+          properties:
+            captain_ids:
+              type: array
+              items:
+                type: integer
+              examples:
+              - - example1
+                - - 123
+                  - 456
+                  - 789
+    SurgeResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          examples:
+          - - success
+            - success
+        message:
+          type: string
+          examples:
+          - - active
+            - Surge Pricing active
+          - - none
+            - No surge pricing in the area.
+        data:
+          type: object
+          properties:
+            is_surge:
+              type: boolean
+              examples:
+              - - true
+                - true
+              - - false
+                - false
+            multiplier:
+              type: number
+              format: float
+              examples:
+              - - low
+                - 1.4
+    ActiveCaptain:
+      type: object
+      properties:
+        id:
+          type: integer
+          examples:
+          - - example1
+            - 123
+        name:
+          type: string
+          examples:
+          - - captain_john
+            - Captain John
+          - - captain_jane
+            - Captain Jane
+        vehicle_type:
+          type: string
+          examples:
+          - - bike
+            - BIKE
+          - - car
+            - CAR
+        current_latitude:
+          type: number
+          format: float
+          examples:
+          - - example1
+            - 40.7128
+        current_longitude:
+          type: number
+          format: float
+          examples:
+          - - example1
+            - -74.006
+        status:
+          type: string
+          examples:
+          - - active
+            - active
+    ActiveCaptainsResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          examples:
+          - - success
+            - success
+        message:
+          type: string
+          examples:
+          - - success
+            - Active captains fetched successfully with in the specified radius.
+        data:
+          type: object
+          properties:
+            captains:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    examples:
+                    - - example1
+                      - 123
+                  name:
+                    type: string
+                    examples:
+                    - - captain_john
+                      - Captain John
+                    - - captain_jane
+                      - Captain Jane
+                  vehicle_type:
+                    type: string
+                    examples:
+                    - - bike
+                      - BIKE
+                    - - car
+                      - CAR
+                  current_latitude:
+                    type: number
+                    format: float
+                    examples:
+                    - - example1
+                      - 40.7128
+                  current_longitude:
+                    type: number
+                    format: float
+                    examples:
+                    - - example1
+                      - -74.006
+                  status:
+                    type: string
+                    examples:
+                    - - active
+                      - active
+security:
+- bearerAuth: []
+paths:
+  /captains:
+    post:
+      summary: Fetch captains for a consumer
+      tags:
+      - Ride Matching
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                request_id:
+                  type: string
+                  examples:
+                  - - example1
+                    - REQ123
+                latitude:
+                  type: number
+                  format: float
+                  examples:
+                  - - example1
+                    - 40.7128
+                longitude:
+                  type: number
+                  format: float
+                  examples:
+                  - - example1
+                    - -74.006
+                vehicle_type:
+                  type: string
+                  examples:
+                  - - bike
+                    - BIKE
+      responses:
+        "200":
+          description: Captains fetched successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    examples:
+                    - - success
+                      - success
+                  message:
+                    type: string
+                    examples:
+                    - - fetched
+                      - Captains fetched successfully.
+                  data:
+                    type: object
+                    properties:
+                      captain_ids:
+                        type: array
+                        items:
+                          type: integer
+                        examples:
+                        - - example1
+                          - - 123
+                            - 456
+                            - 789
+        "400":
+          description: Bad request
+        "401":
+          description: Unauthorized access
+  /surge:
+    post:
+      summary: Check Surge Pricing
+      tags:
+      - Ride Matching
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                request_id:
+                  type: string
+                  examples:
+                  - - example1
+                    - REQ123
+                latitude:
+                  type: number
+                  format: float
+                  examples:
+                  - - example1
+                    - 40.7128
+                longitude:
+                  type: number
+                  format: float
+                  examples:
+                  - - example1
+                    - -74.006
+                vehicle_type:
+                  type: string
+                  examples:
+                  - - bike
+                    - BIKE
+      responses:
+        "200":
+          description: Surge status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    examples:
+                    - - success
+                      - success
+                  message:
+                    type: string
+                    examples:
+                    - - active
+                      - Surge Pricing active
+                    - - none
+                      - No surge pricing in the area.
+                  data:
+                    type: object
+                    properties:
+                      is_surge:
+                        type: boolean
+                        examples:
+                        - - true
+                          - true
+                        - - false
+                          - false
+                      multiplier:
+                        type: number
+                        format: float
+                        examples:
+                        - - low
+                          - 1.4
+        "400":
+          description: Bad request
+        "401":
+          description: Unauthorized access
+  /active-captains:
+    get:
+      summary: Fetch all active captains
+      tags:
+      - Ride Matching
+      responses:
+        "200":
+          description: Active captains fetched successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    examples:
+                    - - success
+                      - success
+                  message:
+                    type: string
+                    examples:
+                    - - success
+                      - Active captains fetched successfully with in the specified radius.
+                  data:
+                    type: object
+                    properties:
+                      captains:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              examples:
+                              - - example1
+                                - 123
+                            name:
+                              type: string
+                              examples:
+                              - - captain_john
+                                - Captain John
+                              - - captain_jane
+                                - Captain Jane
+                            vehicle_type:
+                              type: string
+                              examples:
+                              - - bike
+                                - BIKE
+                              - - car
+                                - CAR
+                            current_latitude:
+                              type: number
+                              format: float
+                              examples:
+                              - - example1
+                                - 40.7128
+                            current_longitude:
+                              type: number
+                              format: float
+                              examples:
+                              - - example1
+                                - -74.006
+                            status:
+                              type: string
+                              examples:
+                              - - active
+                                - active
+        "401":
+          description: Unauthorized access
+  /active-captains-nearby:
+    get:
+      summary: Fetch active captains within radius
+      tags:
+      - Ride Matching
+      parameters:
+      - name: latitude
+        in: query
+        required: true
+        schema:
+          type: number
+          format: float
+        example:
+          example1: 40.7128
+      - name: longitude
+        in: query
+        required: true
+        schema:
+          type: number
+          format: float
+        example:
+          example1: -74.006
+      - name: radius
+        in: query
+        required: true
+        schema:
+          type: integer
+        example:
+          example1: 5000
+      responses:
+        "200":
+          description: Active captains fetched within radius
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    examples:
+                    - - success
+                      - success
+                  message:
+                    type: string
+                    examples:
+                    - - success
+                      - Active captains fetched successfully with in the specified radius.
+                  data:
+                    type: object
+                    properties:
+                      captains:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              examples:
+                              - - example1
+                                - 123
+                            name:
+                              type: string
+                              examples:
+                              - - captain_john
+                                - Captain John
+                              - - captain_jane
+                                - Captain Jane
+                            vehicle_type:
+                              type: string
+                              examples:
+                              - - bike
+                                - BIKE
+                              - - car
+                                - CAR
+                            current_latitude:
+                              type: number
+                              format: float
+                              examples:
+                              - - example1
+                                - 40.7128
+                            current_longitude:
+                              type: number
+                              format: float
+                              examples:
+                              - - example1
+                                - -74.006
+                            status:
+                              type: string
+                              examples:
+                              - - active
+                                - active
+        "401":
+          description: Unauthorized access
